@@ -55,6 +55,7 @@ namespace Components
     static char LastByteRead;
 
     static Dvar::Var g_loadingInitialZones;
+    static Dvar::Var bdgs_thumbs;
 
     static Key CurrentKey;
     static std::vector<std::string> ZonePaths;

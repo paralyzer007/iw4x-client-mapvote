@@ -10,6 +10,7 @@ namespace Components
   std::vector<std::string> FastFiles::ZonePaths;
 
   Dvar::Var FastFiles::g_loadingInitialZones;
+  Dvar::Var FastFiles::bdgs_thumbs;
 
   bool FastFiles::IsIW4xZone = false;
   bool FastFiles::StreamRead = false;
@@ -148,6 +149,16 @@ namespace Components
     if (Utils::IO::FileExists(Dvar::Var("fs_game").get<std::string>() + "/mod.ff"))
     {
       data.push_back({ "mod", 1, 0 });
+    }
+
+    // BDGS map vote: map preview materials (zone\dlc\bdgs_vote.ff).
+    // Loaded like a core zone, NOT through fs_game, so player stats and
+    // custom classes are never touched. The server reads bdgs_thumbs from
+    // userinfo to decide whether to show this player thumbnails or text tiles.
+    if (FastFiles::Exists("bdgs_vote"))
+    {
+      data.push_back({ "bdgs_vote", 1, 0 });
+      bdgs_thumbs.set(true);
     }
 
     return FastFiles::LoadDLCUIZones(data.data(), data.size(), sync);
@@ -627,6 +638,7 @@ namespace Components
   {
     Dvar::Register<bool>("ui_zoneDebug", false, Game::DVAR_ARCHIVE, "Display current loaded zone.");
     g_loadingInitialZones = Dvar::Register<bool>("g_loadingInitialZones", true, Game::DVAR_NONE, "Is loading initial zones");
+    bdgs_thumbs = Dvar::Register<bool>("bdgs_thumbs", false, Game::DVAR_USERINFO, "BDGS map vote: this client has the map preview zone loaded");
 
     Utils::Hook(0x5BC832, Sys_CreateFile_Stub, HOOK_CALL).install()->quick();
     Utils::Hook (0x5BC8A6, Sys_Error_MissingZone, HOOK_CALL).install ()->quick ();
