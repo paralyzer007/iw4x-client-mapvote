@@ -89,6 +89,24 @@ namespace Components::GSC
       Game::ClientUserinfoChanged(ent->s.number);
     });
 
+    Script::AddMethod("GetUserInfo", [](Game::scr_entref_t entref)  // gsc: self GetUserInfo(<key>)
+    {
+      // Reads a key from the userinfo the client sent us (e.g. "bdgs_thumbs").
+      // Returns "" when the key is missing.
+      const auto* ent = Script::Scr_GetPlayerEntity(entref);
+      const auto* key = Game::Scr_GetString(0);
+
+      if (!key || !*key)
+      {
+        Game::Scr_ParamError(0, "GetUserInfo: Illegal parameter!");
+        return;
+      }
+
+      const auto* client = &Game::svs_clients[ent->s.number];
+      const auto* value = Game::Info_ValueForKey(client->userinfo, key);
+      Game::Scr_AddString(value ? value : "");
+    });
+
     Script::AddMethod("ResetClanTag", [](Game::scr_entref_t entref)  // gsc: self ResetClanTag()
     {
       const auto* ent = Script::Scr_GetPlayerEntity(entref);
